@@ -1,7 +1,8 @@
 # 고양이 우편배달부
 
 일본풍 마을을 달리며 편지를 배달하는 고양이 러닝 액션 웹 게임입니다.
-빌드 과정이 없는 정적 웹사이트라서, 파일을 그대로 올리면 어디서든 실행됩니다.
+게임(정적 웹)과 API 서버(랭킹, 통계, 오류 수집)로 이루어져 있고, 둘 다 추가 설치 없이 Node.js 하나로 실행됩니다.
+API 서버가 없어도 게임은 그대로 실행되고, 그때는 랭킹이 기기 안에만 저장됩니다.
 
 - PC: 스페이스·↑ 점프(공중에서 한 번 더), ↓ 슬라이드, P 일시정지
 - 모바일: 화면 탭 점프, 슬라이드 버튼 또는 아래로 쓸기
@@ -16,9 +17,13 @@
 | `js/config.js` | **운영 설정** (버전, 오류·통계 수집 주소) |
 | `js/ops.js` | 저장 데이터, 오류 수집, 통계 전송, 새 버전 알림 |
 | `js/game.js` | 게임 본체 |
+| `js/board.js`, `js/board-ui.js` | 랭킹 저장소 연결, 랭킹 화면과 이름 입력 |
+| `server/` | **API 서버** (`app.mjs` 라우트·검증, `db.mjs` SQLite). 게임 파일도 같이 내려줍니다 |
+| `docs/API.md` | API 문서 |
+| `Dockerfile`, `render.yaml`, `.env.example` | 서버 배포 설정 |
 | `sw.js` | 서비스 워커 (오프라인 실행, 업데이트) |
 | `manifest.webmanifest`, `icons/` | 앱 설치 정보와 아이콘, 공유 이미지 |
-| `tests/smoke.mjs` | 배포 전 자동 점검 |
+| `tests/api.test.mjs`, `tests/smoke.mjs` | 배포 전 자동 점검 (API 8개, 게임 16개) |
 | `.github/workflows/deploy.yml` | 테스트 통과 시 GitHub Pages 자동 배포 |
 | `_headers`, `netlify.toml` | Netlify·Cloudflare Pages 용 보안·캐시 헤더 |
 
@@ -36,14 +41,36 @@
 ## 로컬에서 실행
 
 ```bash
-npm start          # http://localhost:8080
+npm start          # 게임 + API: http://localhost:8080
+npm test           # 자동 점검 (처음 한 번 npm install 과 npx playwright install chromium 필요)
 ```
 
-Node.js 18 이상이면 추가 설치 없이 됩니다. 주소 뒤에 `?debug=1` 을 붙이면 서비스 워커를 끄고 콘솔에서 `window.__cat` 으로 게임 상태를 볼 수 있습니다.
+Node.js 22.13 이상이면 추가 설치 없이 됩니다. 랭킹을 파일로 남기려면 `DATA_DIR=./data npm start` 로 실행하세요. 환경변수는 `.env.example` 참고. 주소 뒤에 `?debug=1` 을 붙이면 서비스 워커를 끄고 콘솔에서 `window.__cat` 으로 게임 상태를 볼 수 있습니다.
 
 ## 배포
 
-### 방법 1. GitHub Pages (추천, 무료, 자동 배포)
+### 방법 A. 게임 + API 를 한 서버에 (추천: 공유 링크 하나로 랭킹까지)
+
+Render 기준입니다. Fly.io, Railway, 일반 서버도 `Dockerfile` 로 똑같이 올라갑니다.
+
+1. 이 폴더를 GitHub 저장소에 올립니다.
+2. https://dashboard.render.com 에서 **New → Blueprint** 로 저장소를 고르면 `render.yaml` 대로 만들어집니다. 비밀값(`RUN_SECRET`, `ADMIN_KEY`)은 자동 생성됩니다.
+3. 생긴 주소(`https://<이름>.onrender.com`)가 곧 공유 링크입니다. 게임과 `/api` 가 같은 주소라 따로 설정할 게 없습니다.
+
+랭킹을 보존하려면 디스크가 필요해서 유료 플랜(월 몇 달러)이 필요합니다. 무료 플랜으로 바꾸려면 `render.yaml` 에서 `plan: free` 로 바꾸고 `disk` 항목을 지우면 되지만, 서버가 재시작될 때 랭킹이 지워집니다.
+
+직접 서버에 올릴 때:
+
+```bash
+docker build -t cat-mail-carrier .
+docker run -d -p 8080:8080 -v catdata:/data -e RUN_SECRET=<긴 무작위 문자열> -e ADMIN_KEY=<관리자 키> cat-mail-carrier
+```
+
+### 방법 B. 게임은 정적 호스팅, API 는 따로
+
+게임을 GitHub Pages 등에 올리고 API 서버만 다른 곳에 둘 수도 있습니다. 이때 `js/config.js` 의 `apiBase` 를 `https://<API 서버>/api` 로 바꾸고, 서버의 `ALLOWED_ORIGINS` 에 게임 주소를 넣으세요.
+
+### 방법 1. GitHub Pages (무료, 자동 배포, 랭킹은 기기 안에만)
 
 1. GitHub 에 빈 저장소를 만들고 이 폴더 내용을 `main` 브랜치에 올립니다.
 2. 저장소 **Settings → Pages → Build and deployment → Source** 를 **GitHub Actions** 로 바꿉니다.
@@ -60,6 +87,10 @@ Node.js 18 이상이면 추가 설치 없이 됩니다. 주소 뒤에 `?debug=1`
 `index.html` 의 `og:image` 는 상대 경로입니다. 카카오톡·트위터 미리보기 이미지가 잘 나오려면 실제 주소로 바꿔 주세요.
 예: `https://game.example.com/icons/og-image.png`
 
+### 파일 하나로 보내기
+
+`npm run build:single` 을 실행하면 `dist/cat-mail-carrier.html` 한 파일이 만들어집니다. 메신저로 보내거나 아무 곳에나 올려도 실행됩니다 (랭킹은 기기 안에만).
+
 ## 업데이트하는 법
 
 ```bash
@@ -73,15 +104,22 @@ git commit -am "v1.1.0" && git push
 
 ## 운영
 
+### API 서버
+
+- 상태 확인: `GET /api/health`. 모니터링 서비스(UptimeRobot 등)에 이 주소를 걸어 두세요.
+- 통계와 오류 보기, 부적절한 랭킹 기록 숨기기: `docs/API.md` 의 관리자 항목.
+- 백업: `DATA_DIR/game.db` 파일 하나를 복사하면 됩니다.
+- 점수 검증 기준(`server/app.mjs` 의 `RULES`)은 게임 밸런스를 바꿀 때 같이 조정하세요.
+
 ### 오류 확인
 
 - 오류가 나면 플레이어 화면에 "문제가 생겼어요 [새로고침]" 안내가 뜹니다.
 - 최근 오류 20개는 플레이어 브라우저에 남습니다. 문의가 오면 그 사람에게 브라우저 콘솔에서 `Ops.errors()` 를 실행해 달라고 하면 됩니다.
-- 오류를 서버로 모으고 싶으면 `js/config.js` 의 `errorEndpoint` 에 JSON 을 받는 주소를 넣습니다. (예: Sentry 터널, Cloudflare Worker, Google Apps Script 웹앱)
+- API 서버가 연결돼 있으면 오류와 플레이 통계가 자동으로 그쪽에 쌓입니다. 다른 곳으로 보내려면 `js/config.js` 의 `errorEndpoint`, `analyticsEndpoint` 에 주소를 넣습니다.
 
 ### 플레이 통계
 
-`js/config.js` 의 `analyticsEndpoint` 에 주소를 넣으면 다음 이벤트가 JSON 으로 전송됩니다. 비워 두면 아무것도 보내지 않습니다.
+API 서버가 있으면 다음 이벤트가 전송됩니다. API 서버도 없고 `analyticsEndpoint` 도 비어 있으면 아무것도 보내지 않습니다.
 
 | 이벤트 | 함께 보내는 값 |
 | --- | --- |
@@ -94,7 +132,7 @@ git commit -am "v1.1.0" && git push
 
 ### 저장 데이터
 
-최고 점수와 소리 설정만 플레이어 브라우저(localStorage, `catpost_save_v1`)에 저장합니다. 서버나 계정이 없어 개인정보 처리 대상이 없습니다. 저장값이 깨져 있으면 자동으로 초기화됩니다.
+플레이어 브라우저(localStorage, `catpost_save_v1`)에는 최고 점수, 소리 설정, 마지막에 쓴 랭킹 이름만 저장합니다. 서버에는 플레이어가 직접 적은 랭킹 이름과 점수만 남고, 계정이나 이메일은 받지 않습니다. 저장값이 깨져 있으면 자동으로 초기화됩니다.
 
 ### 배포 전 점검표
 

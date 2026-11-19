@@ -1,0 +1,18 @@
+# Render 블루프린트: 저장소를 연결하면 게임 + API 서버가 한 주소로 올라갑니다.
+services:
+  - type: web
+    name: cat-mail-carrier
+    runtime: docker
+    plan: starter        # 랭킹을 보존하려면 디스크가 필요해서 유료(starter) 이상. 무료 플랜은 재시작 때 랭킹이 지워집니다.
+    healthCheckPath: /api/health
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: RUN_SECRET
+        generateValue: true
+      - key: ADMIN_KEY
+        generateValue: true
+      - key: ALLOWED_ORIGINS
+        value: "*"

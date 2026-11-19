@@ -62,3 +62,25 @@ kbd{font-family:var(--f-ui);background:#fff;border:calc(var(--u)*1.5) solid var(
 .ver{font-size:calc(var(--u)*12);color:#9a8a98;margin-top:calc(var(--u)*4);}
 .card.wide{max-width:none;}
 .nojs{padding:24px;font-size:18px;}
+.btn.small{font-size:calc(var(--u)*18);padding:calc(var(--u)*5) calc(var(--u)*20);box-shadow:0 calc(var(--u)*3) 0 var(--ink);}
+.card .btn+.btn{margin-left:calc(var(--u)*8);}
+.submit{margin:0 auto calc(var(--u)*14);font-size:calc(var(--u)*15);color:#5b4a5e;}
+.submit label{display:block;margin-bottom:calc(var(--u)*4);}
+.submitrow{display:flex;gap:calc(var(--u)*8);justify-content:center;align-items:center;}
+.submit input{font-family:var(--f-ui);font-size:calc(var(--u)*18);width:calc(var(--u)*190);padding:calc(var(--u)*6) calc(var(--u)*12);border:calc(var(--u)*2.5) solid var(--ink);
+  border-radius:calc(var(--u)*30);background:#fff;color:var(--ink);-webkit-user-select:text;user-select:text;}
+.submit input:focus-visible{outline:calc(var(--u)*3) solid var(--gold);}
+.submitmsg{min-height:1.4em;margin-top:calc(var(--u)*4);}
+.submitmsg.ok{color:#3f7a2a;} .submitmsg.err{color:var(--shu);}
+.card.board{width:calc(var(--u)*460);}
+.tabs{display:flex;gap:calc(var(--u)*6);justify-content:center;margin-bottom:calc(var(--u)*8);}
+.tab{font-family:var(--f-ui);font-size:calc(var(--u)*15);border:calc(var(--u)*2) solid var(--ink);border-radius:calc(var(--u)*20);background:var(--paper2);color:var(--ink);padding:calc(var(--u)*2) calc(var(--u)*14);cursor:pointer;}
+.tab.on{background:var(--ai);color:#fff;}
+.boardlist{list-style:none;margin:0 0 calc(var(--u)*6);padding:0;max-height:calc(var(--u)*250);overflow-y:auto;font-variant-numeric:tabular-nums;}
+.boardlist li{display:grid;grid-template-columns:calc(var(--u)*34) 1fr auto calc(var(--u)*90);gap:calc(var(--u)*8);align-items:center;font-size:calc(var(--u)*17);padding:calc(var(--u)*3) calc(var(--u)*8);border-radius:calc(var(--u)*6);text-align:left;}
+.boardlist li:nth-child(odd){background:var(--paper2);}
+.boardlist li.mine{outline:calc(var(--u)*2) solid var(--shu);}
+.boardlist .rk{color:var(--shu);text-align:center;} .boardlist li:nth-child(-n+3) .rk{font-size:1.15em;}
+.boardlist .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+.boardlist .st{font-size:.8em;color:#7a6a78;} .boardlist .sc{text-align:right;}
+.boardmsg{color:#6a5868;min-height:1.4em;}

@@ -1,14 +1,19 @@
 {
   "name": "cat-mail-carrier",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "고양이 우편배달부: 일본풍 러닝 액션 웹 게임",
   "scripts": {
-    "start": "node scripts/serve.mjs",
-    "test": "node tests/smoke.mjs",
+    "start": "node server/app.mjs",
+    "start:static": "node scripts/serve.mjs",
+    "build:single": "node scripts/build-single.mjs",
+    "test": "node --test tests/api.test.mjs && node tests/smoke.mjs",
     "release": "bash scripts/release.sh"
   },
   "devDependencies": {
     "playwright": "1.48.2"
+  },
+  "engines": {
+    "node": ">=22.13"
   }
 }

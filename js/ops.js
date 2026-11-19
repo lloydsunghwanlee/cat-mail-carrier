@@ -2,6 +2,7 @@
 (function(){
   'use strict';
   const C = window.CAT_CONFIG || {};
+  const EP = { errors: C.errorEndpoint || '', events: C.analyticsEndpoint || '' };
   const VERSION = C.version || 'dev';
   const SAVE_KEY = 'catpost_save_v1';
   const ERR_KEY = 'catpost_errors';
@@ -44,7 +45,7 @@
     if (errCount > 20) return; // 같은 세션에서 폭주 방지
     const rec = { kind, msg: String(msg).slice(0, 300), stack: String(stack || '').slice(0, 1200), ua: navigator.userAgent.slice(0, 160), url: location.pathname };
     try { const list = JSON.parse(localStorage.getItem(ERR_KEY) || '[]'); list.push(Object.assign({ v: VERSION, t: Date.now() }, rec)); localStorage.setItem(ERR_KEY, JSON.stringify(list.slice(-20))); } catch (e) {}
-    send(C.errorEndpoint, { type: 'error', ...rec });
+    send(EP.errors, { type: 'error', ...rec });
     toast('문제가 생겼어요. 계속 이상하면 새로고침해 주세요.', '새로고침', () => location.reload());
   }
   window.addEventListener('error', e => report('error', e.message, e.error && e.error.stack));
@@ -62,7 +63,7 @@
   }
 
   // ---- 서비스 워커 (오프라인 실행 + 새 버전 알림) ----
-  if ('serviceWorker' in navigator && window.isSecureContext && !debug) {
+  if ('serviceWorker' in navigator && window.isSecureContext && !debug && C.serviceWorker !== false) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js').then(reg => {
         const ask = w => toast('새 버전이 나왔어요.', '업데이트', () => w.postMessage('skipWaiting'));
@@ -78,6 +79,9 @@
     });
   }
 
-  window.Ops = { version: VERSION, debug, save, track: (name, data) => send(C.analyticsEndpoint, { type: 'event', name, data: data || {} }), toast,
+  // API 서버가 확인되면 따로 정한 주소가 없을 때 그쪽으로 보냄
+  function useApi(base){ if (!EP.errors) EP.errors = base + '/errors'; if (!EP.events) EP.events = base + '/events'; }
+
+  window.Ops = { version: VERSION, debug, save, useApi, session, track: (name, data) => send(EP.events, { type: 'event', name, data: data || {} }), toast,
     errors(){ try { return JSON.parse(localStorage.getItem(ERR_KEY) || '[]'); } catch (e) { return []; } } };
 })();

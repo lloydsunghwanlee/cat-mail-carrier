@@ -1,8 +1,9 @@
 // 배포 전 자동 점검: 페이지가 뜨고, 게임이 시작되고, 3개 스테이지·레벨업·먹기·피격·배달 완료가 오류 없이 돈다.
 import { chromium } from 'playwright';
-import { serve } from '../scripts/serve.mjs';
+import { createApp } from '../server/app.mjs';
 
-const server = await serve(0);
+const server = createApp({ rules: { minRunMs: 0 }, secret: 'test' });
+await new Promise(r => server.listen(0, r));
 const base = `http://localhost:${server.address().port}/`;
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1100, height: 640 } });
@@ -44,6 +45,15 @@ try {
   await page.waitForFunction(() => window.__cat.G.state === 'over', null, { timeout: 5000 }).catch(() => {});
   check(await page.isVisible('#ovOver'), '피격 → 게임 오버 화면');
   check(await ev(() => window.Ops.save.get().best > 0), '최고 점수 저장');
+  check(await ev(() => window.Board.mode) === 'api', 'API 서버 연결');
+  await page.fill('#nameInput', '테스트 냥이');
+  await page.click('#btnSubmit');
+  await page.waitForSelector('#submitMsg.ok', { timeout: 5000 }).catch(() => {});
+  check(/1위/.test(await page.textContent('#submitMsg')), '점수 등록 → 랭킹 1위');
+  await page.click('#btnHome');
+  await page.click('#btnBoard');
+  await page.waitForSelector('#boardList li', { timeout: 5000 }).catch(() => {});
+  check((await page.textContent('#boardList')).includes('테스트 냥이'), '랭킹 화면에 표시');
   check(errors.length === 0, '자바스크립트 오류 없음' + (errors.length ? ': ' + errors.join(' | ') : ''));
 } catch (e) {
   console.error(e); failed++;

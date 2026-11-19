@@ -45,6 +45,7 @@
         </div>
         <div class="keys" id="keysHelp"><kbd>Space</kbd>·<kbd>↑</kbd>·탭 점프 (공중에서 한 번 더) &nbsp; <kbd>↓</kbd> 슬라이드 &nbsp; <kbd>P</kbd> 일시정지</div>
         <button class="btn" id="btnStart">배달 출발!</button>
+        <button class="btn ghost" id="btnBoard">랭킹</button>
         <div class="best" id="bestTitle"></div>
         <div class="ver" id="verLabel"></div>
       </div>
@@ -64,6 +65,7 @@
         <h2 id="clearTitle">배달 완료!</h2>
         <p id="clearMsg"></p>
         <div class="rows" id="clearRows"></div>
+        <div id="clearSubmitSlot"></div>
         <button class="btn" id="btnNext">다음 배달지로</button>
       </div>
     </div>
@@ -73,10 +75,34 @@
         <h2>배달 실패…</h2>
         <p id="overMsg"></p>
         <div class="rows" id="overRows"></div>
+        <div id="overSubmitSlot"></div>
         <button class="btn" id="btnRetry">다시 도전</button>
         <button class="btn ghost" id="btnHome">처음 화면</button>
       </div>
     </div>
+
+    <div class="ov" id="ovBoard" hidden>
+      <div class="card board">
+        <h2 id="boardTitle">랭킹</h2>
+        <div class="tabs" id="boardTabs" hidden>
+          <button type="button" class="tab on" data-period="all">전체</button>
+          <button type="button" class="tab" data-period="week">이번 주</button>
+          <button type="button" class="tab" data-period="day">오늘</button>
+        </div>
+        <ol class="boardlist" id="boardList"></ol>
+        <p class="boardmsg" id="boardMsg"></p>
+        <button class="btn" id="btnBoardClose">닫기</button>
+      </div>
+    </div>
+
+    <form id="submitBox" class="submit" hidden autocomplete="off">
+      <label for="nameInput">랭킹에 올릴 이름</label>
+      <div class="submitrow">
+        <input id="nameInput" name="name" type="text" maxlength="12" placeholder="12자까지" enterkeyhint="done">
+        <button class="btn small" id="btnSubmit" type="submit">등록</button>
+      </div>
+      <div class="submitmsg" id="submitMsg" role="status"></div>
+    </form>
 
     <div class="ov" id="ovPause" hidden>
       <div class="card">
@@ -91,6 +117,8 @@
 <div id="rotate">가로로 돌리면 화면이 더 커져요</div>
 <script src="js/config.js"></script>
 <script src="js/ops.js"></script>
+<script src="js/board.js"></script>
 <script src="js/game.js"></script>
+<script src="js/board-ui.js"></script>
 </body>
 </html>

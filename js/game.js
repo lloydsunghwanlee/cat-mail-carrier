@@ -707,7 +707,7 @@ function drawUpIcon(id){
 }
 
 /* ---------------- 화면/오버레이 ---------------- */
-const OVS=['ovTitle','ovLevel','ovClear','ovOver','ovPause'];
+const OVS=['ovTitle','ovLevel','ovClear','ovOver','ovPause','ovBoard'];
 function showOv(id){for(const o of OVS)$(o).hidden=o!==id;}
 function setState(s){G.state=s;
   if(s==='play'||s==='deliver'||s==='dying')showOv(null);
@@ -744,20 +744,23 @@ function showClear(){
   $('clearRows').innerHTML=`<span>모은 편지 ${G.stageLetters}통</span><span>+${lb.toLocaleString('ko-KR')}</span><span>남은 체력 보너스</span><span>+${hpB.toLocaleString('ko-KR')}</span><span>배달 보너스</span><span>+${delB.toLocaleString('ko-KR')}</span><span class="tot">총점</span><span class="tot">${Math.floor(G.score).toLocaleString('ko-KR')}</span>`;
   $('btnNext').textContent=last?'처음부터 다시':'다음 배달지로';
   if(last)updateBest();
+  if(window.BoardUI)BoardUI.runEnd(last?'clear':null,{score:G.score,stage:G.stage+1,level:G.level,letters:G.letters,cleared:true});
   Ops.track('stage_clear',{stage:G.stage+1,score:Math.floor(G.score),level:G.level,hp:P.hp});
   setState('clear');showOv('ovClear');setTimeout(()=>$('btnNext').focus({preventScroll:true}),50);
 }
 function updateBest(){if(G.score>G.best){G.best=Math.floor(G.score);saveBest(G.best);}}
 function showOver(){
+  G.banner=null;G.cutin=null;
   updateBest();const st=STAGES[G.stage];
   Ops.track('game_over',{stage:G.stage+1,score:Math.floor(G.score),level:G.level,dist:Math.floor(G.dist)});
   $('overMsg').textContent=`${st.name}에서 넘어졌어요. ${st.recipient}께서 기다리고 있어요!`;
   $('overRows').innerHTML=`<span>점수</span><span>${Math.floor(G.score).toLocaleString('ko-KR')}</span><span>모은 편지</span><span>${G.letters}통</span><span>레벨</span><span>${G.level}</span><span class="tot">최고 점수</span><span class="tot">${G.best.toLocaleString('ko-KR')}</span>`;
+  if(window.BoardUI)BoardUI.runEnd('over',{score:G.score,stage:G.stage+1,level:G.level,letters:G.letters,cleared:false});
   setState('over');showOv('ovOver');setTimeout(()=>$('btnRetry').focus({preventScroll:true}),50);
 }
-function toTitle(){G.stage=0;G.state='title';initAmbient();P.eat=null;P.buldak=0;P.shield=0;ents=[];picks=[];shots=[];G.goal=null;
+function toTitle(){G.stage=0;G.state='title';G.banner=null;G.hint=null;G.cutin=null;initAmbient();P.eat=null;P.buldak=0;P.shield=0;ents=[];picks=[];shots=[];G.goal=null;
   $('bestTitle').textContent=G.best?`최고 점수 ${G.best.toLocaleString('ko-KR')}`:'';showOv('ovTitle');setState('title');}
-function startGame(){SFX.init();resetRun();startStage(0);Ops.track('game_start');}
+function startGame(){SFX.init();resetRun();startStage(0);Ops.track('game_start');if(window.BoardUI)BoardUI.runStart();}
 function pause(on){if(on&&G.state==='play'){setState('pause');$('pauseInfo').textContent=`${G.stage+1}장 ${STAGES[G.stage].name} · 점수 ${Math.floor(G.score).toLocaleString('ko-KR')}`;showOv('ovPause');}
   else if(!on&&G.state==='pause'){setState('play');showOv(null);}}
 
@@ -778,6 +781,7 @@ const bsUp=()=>{input.touchSlide=false;bs.classList.remove('on');};bs.addEventLi
 stage.addEventListener('contextmenu',e=>e.preventDefault());
 window.addEventListener('keydown',e=>{
   const k=e.key;
+  if(e.target&&/^(INPUT|TEXTAREA)$/.test(e.target.tagName))return;
   if([' ','ArrowUp','ArrowDown'].includes(k))e.preventDefault();
   if(G.state==='levelup'&&['1','2','3'].includes(k)){chooseUp(+k-1);return;}
   if(k==='p'||k==='P'||k==='Escape'){pause(G.state==='play');return;}
@@ -809,4 +813,5 @@ drawOn($('icoCookie'),2,()=>drawCookie(24,25,1,0,.2));
 $('verLabel').textContent='v'+Ops.version;
 toTitle();
 requestAnimationFrame(frame);
+window.CatGame={showOv,toTitle,get state(){return G.state;}};
 if(Ops.debug)window.__cat={G,P,get S(){return S;},get WPN(){return WPN;},startGame,startStage,eat,openLevelUp,get ents(){return ents;}};

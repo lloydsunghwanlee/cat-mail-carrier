@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>고양이 우편배달부</title>
+<meta name="description" content="벚꽃 마을에서 축제의 밤까지! 장애물을 피해 편지를 배달하는 고양이 러닝 액션 게임. 불닭볶음면과 두쫀쿠를 먹고 파워업!">
+<meta name="theme-color" content="#161328">
+<meta property="og:type" content="website">
+<meta property="og:title" content="고양이 우편배달부">
+<meta property="og:description" content="장애물을 피해 편지를 배달하는 고양이 러닝 액션 게임">
+<meta property="og:image" content="icons/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="고양이 배달">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Brush+Script&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<noscript><p class="nojs">이 게임은 자바스크립트가 켜져 있어야 실행돼요.</p></noscript>
+<div id="wrap">
+  <div id="stage">
+    <canvas id="cv" aria-label="고양이 우편배달부 게임 화면"></canvas>
+    <button class="hud-btn" id="btnMute" aria-label="소리 켜기/끄기">♪</button>
+    <button class="hud-btn" id="btnPause" aria-label="일시정지">Ⅱ</button>
+    <button id="btnSlide" hidden>↓<br>슬라이드</button>
+
+    <div class="ov" id="ovTitle">
+      <div class="card">
+        <div class="hanko">우편<br>배달</div>
+        <h1>고양이 우편배달부</h1>
+        <p class="tag">벚꽃 마을에서 축제의 밤까지, 편지를 배달하라냥!</p>
+        <div class="howto">
+          <div><canvas id="icoLetter" width="96" height="96"></canvas><span>편지를 모으면 <b>점수</b>와 <b>경험치</b>. 레벨업하면 능력을 하나 고를 수 있어요.</span></div>
+          <div><canvas id="icoGoal" width="96" height="96"></canvas><span>장애물을 피해 끝까지 달리면 <b>배달 성공</b>. 스테이지마다 더 빨라져요.</span></div>
+          <div><canvas id="icoBuldak" width="96" height="96"></canvas><span><b>불닭볶음면</b>: 먹으면 불닭 모드! 무적이 되고 부딪힌 걸 전부 태워요.</span></div>
+          <div><canvas id="icoCookie" width="96" height="96"></canvas><span><b>두쫀쿠</b>: 체력 회복, 쫀득 보호막, 편지 자석이 한꺼번에!</span></div>
+        </div>
+        <div class="keys" id="keysHelp"><kbd>Space</kbd>·<kbd>↑</kbd>·탭 점프 (공중에서 한 번 더) &nbsp; <kbd>↓</kbd> 슬라이드 &nbsp; <kbd>P</kbd> 일시정지</div>
+        <button class="btn" id="btnStart">배달 출발!</button>
+        <div class="best" id="bestTitle"></div>
+        <div class="ver" id="verLabel"></div>
+      </div>
+    </div>
+
+    <div class="ov" id="ovLevel" hidden>
+      <div class="card wide">
+        <h2>레벨 업!</h2>
+        <p>능력을 하나 고르세요</p>
+        <div class="cards" id="upCards"></div>
+      </div>
+    </div>
+
+    <div class="ov" id="ovClear" hidden>
+      <div class="card">
+        <div class="hanko">배달<br>완료</div>
+        <h2 id="clearTitle">배달 완료!</h2>
+        <p id="clearMsg"></p>
+        <div class="rows" id="clearRows"></div>
+        <button class="btn" id="btnNext">다음 배달지로</button>
+      </div>
+    </div>
+
+    <div class="ov" id="ovOver" hidden>
+      <div class="card">
+        <h2>배달 실패…</h2>
+        <p id="overMsg"></p>
+        <div class="rows" id="overRows"></div>
+        <button class="btn" id="btnRetry">다시 도전</button>
+        <button class="btn ghost" id="btnHome">처음 화면</button>
+      </div>
+    </div>
+
+    <div class="ov" id="ovPause" hidden>
+      <div class="card">
+        <h2>잠깐 쉬는 중</h2>
+        <p id="pauseInfo"></p>
+        <button class="btn" id="btnResume">계속 달리기</button>
+        <button class="btn ghost" id="btnQuit">처음 화면</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="rotate">가로로 돌리면 화면이 더 커져요</div>
+<script src="js/config.js"></script>
+<script src="js/ops.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>

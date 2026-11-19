@@ -1,0 +1,16 @@
+# Netlify / Cloudflare Pages 용 헤더 (GitHub Pages 는 이 파일을 무시합니다)
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https:; script-src 'self'
+/sw.js
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache
+/js/*
+  Cache-Control: no-cache
+/css/*
+  Cache-Control: no-cache
+/icons/*
+  Cache-Control: public, max-age=604800

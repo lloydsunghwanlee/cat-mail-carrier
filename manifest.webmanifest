@@ -1,0 +1,17 @@
+{
+  "name": "고양이 우편배달부",
+  "short_name": "고양이 배달",
+  "description": "일본풍 마을을 달리며 편지를 배달하는 고양이 러닝 액션 게임",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#161328",
+  "theme_color": "#161328",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -6,7 +6,7 @@ const server = createApp({ rules: { minRunMs: 0 }, secret: 'test' });
 await new Promise(r => server.listen(0, r));
 const base = `http://localhost:${server.address().port}/`;
 const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: 1100, height: 640 } });
+const page = await browser.newPage({ viewport: { width: 1100, height: 640 }, bypassCSP: true }); // 테스트의 waitForFunction 이 CSP(script-src 'self')에 막히지 않게
 const errors = [];
 page.on('pageerror', e => errors.push(e.message));
 page.on('console', m => { if (m.type() === 'error' && !/fonts\.(googleapis|gstatic)/.test(m.text())) errors.push(m.text()); });

@@ -66,9 +66,17 @@ docker build -t cat-mail-carrier .
 docker run -d -p 8080:8080 -v catdata:/data -e RUN_SECRET=<긴 무작위 문자열> -e ADMIN_KEY=<관리자 키> cat-mail-carrier
 ```
 
-### 방법 B. 게임은 정적 호스팅, API 는 따로
+### 방법 B. 게임은 GitHub Pages, API 는 Render (지금 쓰는 구성)
 
-게임을 GitHub Pages 등에 올리고 API 서버만 다른 곳에 둘 수도 있습니다. 이때 `js/config.js` 의 `apiBase` 를 `https://<API 서버>/api` 로 바꾸고, 서버의 `ALLOWED_ORIGINS` 에 게임 주소를 넣으세요.
+1. 아래 버튼으로 Render 에 API 서버를 만듭니다 (GitHub 계정으로 로그인 → Apply).
+
+   [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/lloydsunghwanlee/cat-mail-carrier)
+
+2. 만들어진 주소(예: `https://cat-mail-carrier.onrender.com`)를 `js/config.js` 의 `apiRemote` 에 `/api` 를 붙여 적습니다.
+3. `npm run release -- x.y.z` 로 버전을 올리고 푸시하면 GitHub Pages 의 게임이 그 서버의 랭킹을 씁니다.
+
+`render.yaml` 의 `ALLOWED_ORIGINS` 는 GitHub Pages 주소만 허용하도록 되어 있습니다. 게임 주소가 바뀌면 같이 바꾸세요.
+서버가 잠들어 있다 깨어나는 동안에는 게임이 먼저 실행되고, 연결되면 랭킹이 자동으로 켜집니다.
 
 ### 방법 1. GitHub Pages (무료, 랭킹은 기기 안에만) — 지금 쓰는 방식
 

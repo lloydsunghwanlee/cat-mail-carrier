@@ -1,5 +1,5 @@
 /* 서비스 워커: 게임 파일을 캐시해서 오프라인에서도 실행. 배포할 때 VERSION을 올리면 새 캐시로 교체됩니다. */
-const VERSION = '1.1.0';
+const VERSION = '1.1.1';
 const CACHE = 'catpost-' + VERSION;
 const CORE = ['./', 'index.html', 'css/style.css', 'js/config.js', 'js/ops.js', 'js/board.js', 'js/game.js', 'js/board-ui.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/favicon-32.png'];

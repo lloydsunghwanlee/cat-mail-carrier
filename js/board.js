@@ -8,17 +8,25 @@
   const LOCAL_KEY = 'catpost_local_board';
   let mode = 'local', api = '', db = null, uid = null, run = null;
   const listeners = [];
+  async function probe(base, ms){
+    try {
+      const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), ms);
+      const r = await fetch(base + '/health', { signal: ctl.signal, cache: 'no-store' }); clearTimeout(t);
+      const j = r.ok && /json/.test(r.headers.get('content-type') || '') ? await r.json() : null;
+      if (j && j.ok) { mode = 'api'; api = base; Ops.useApi(base); return true; }
+    } catch (e) {}
+    return false;
+  }
   const ready = (async () => {
     // 1) API
+    const remote = (C.apiRemote || '').replace(/\/$/, '');
     const cands = C.apiBase === 'auto' ? ['api'] : C.apiBase ? [C.apiBase.replace(/\/$/, '')] : [];
+    if (remote && !cands.includes(remote)) cands.push(remote);
     for (const base of cands) {
-      try {
-        const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 2500);
-        const r = await fetch(base + '/health', { signal: ctl.signal, cache: 'no-store' }); clearTimeout(t);
-        const j = r.ok && /json/.test(r.headers.get('content-type') || '') ? await r.json() : null;
-        if (j && j.ok) { mode = 'api'; api = base; Ops.useApi(base); return mode; }
-      } catch (e) {}
+      if (await probe(base, base === remote ? 8000 : 2500)) return mode;
     }
+    // 원격 서버가 잠들어 있다 깨어나는 중일 수 있어 뒤에서 몇 번 더 시도 (연결되면 랭킹이 자동으로 켜짐)
+    if (remote) { let n = 0; const again = async () => { if (mode !== 'local' || ++n > 8) return; if (!(await probe(remote, 15000))) setTimeout(again, 10000); else listeners.forEach(f => f(mode)); }; setTimeout(again, 3000); }
     // 2) claude.ai 공유 페이지 db
     try {
       if (window.claude && window.claude.use) {

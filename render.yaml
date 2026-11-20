@@ -3,12 +3,13 @@ services:
   - type: web
     name: cat-mail-carrier
     runtime: docker
-    plan: starter        # 랭킹을 보존하려면 디스크가 필요해서 유료(starter) 이상. 무료 플랜은 재시작 때 랭킹이 지워집니다.
+    plan: free           # 무료: 15분간 접속이 없으면 잠들고, 그때 랭킹이 지워집니다.
+    # 랭킹을 보존하려면 plan: starter 로 바꾸고 아래 주석을 푸세요 (유료).
+    # disk:
+    #   name: data
+    #   mountPath: /data
+    #   sizeGB: 1
     healthCheckPath: /api/health
-    disk:
-      name: data
-      mountPath: /data
-      sizeGB: 1
     envVars:
       - key: RUN_SECRET
         generateValue: true

@@ -24,7 +24,7 @@ API 서버가 없어도 게임은 그대로 실행되고, 그때는 랭킹이 �
 | `sw.js` | 서비스 워커 (오프라인 실행, 업데이트) |
 | `manifest.webmanifest`, `icons/` | 앱 설치 정보와 아이콘, 공유 이미지 |
 | `tests/api.test.mjs`, `tests/smoke.mjs` | 배포 전 자동 점검 (API 8개, 게임 16개) |
-| `.github/workflows/deploy.yml` | 테스트 통과 시 GitHub Pages 자동 배포 |
+| `.github/workflows/test.yml` | 푸시할 때마다 자동 점검 |
 | `_headers`, `netlify.toml` | Netlify·Cloudflare Pages 용 보안·캐시 헤더 |
 
 ### 게임 코드 구조 (뱀서라이크 확장용)
@@ -70,11 +70,12 @@ docker run -d -p 8080:8080 -v catdata:/data -e RUN_SECRET=<긴 무작위 문자�
 
 게임을 GitHub Pages 등에 올리고 API 서버만 다른 곳에 둘 수도 있습니다. 이때 `js/config.js` 의 `apiBase` 를 `https://<API 서버>/api` 로 바꾸고, 서버의 `ALLOWED_ORIGINS` 에 게임 주소를 넣으세요.
 
-### 방법 1. GitHub Pages (무료, 자동 배포, 랭킹은 기기 안에만)
+### 방법 1. GitHub Pages (무료, 랭킹은 기기 안에만) — 지금 쓰는 방식
 
-1. GitHub 에 빈 저장소를 만들고 이 폴더 내용을 `main` 브랜치에 올립니다.
-2. 저장소 **Settings → Pages → Build and deployment → Source** 를 **GitHub Actions** 로 바꿉니다.
-3. 이후 `main` 에 푸시할 때마다 자동 점검(`npm test`)이 돌고, 통과하면 `https://<아이디>.github.io/<저장소>/` 에 배포됩니다. 점검이 실패하면 배포되지 않아서 망가진 버전이 올라가지 않습니다.
+현재 주소: https://lloydsunghwanlee.github.io/cat-mail-carrier/
+
+저장소 **Settings → Pages** 가 **Deploy from a branch (main, / root)** 로 설정되어 있어서, `main` 에 푸시하면 1~2분 뒤 자동으로 반영됩니다.
+푸시할 때마다 자동 점검(`npm test`)도 따로 돌아가니, Actions 탭에 빨간 표시가 뜨면 그 변경은 되돌리거나 고쳐 주세요.
 
 ### 방법 2. Netlify 또는 Cloudflare Pages (끌어다 놓기)
 
